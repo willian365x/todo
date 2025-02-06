@@ -6,38 +6,70 @@ import java.sql.*;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Objects;
+import java.util.Scanner;
 
 public class Main {
+    private static TodoController todoController = new TodoController();
+
+    public static void viewTodos() {
+        for (Todo objTodo : todoController.getList()) {
+            System.out.println("\nID: " + objTodo.getId());
+            System.out.println("Nome: " + objTodo.getNome());
+            System.out.println("Descrição: " + objTodo.getDescricao());
+            System.out.println("Data: " + objTodo.getData());
+            System.out.println("Hora: " + objTodo.getHora());
+            System.out.println("Concluída: " + objTodo.isIsok());
+            System.out.println("-------------------------------------------");
+        }
+    }
+
     public static void main(String[] args) throws SQLException {
-        Todo todo = new Todo();
-        todo.setNome("Trabalho");
-        todo.setDescricao("Construir uma planilha");
+        Scanner scanner = new Scanner(System.in);
+        System.out.println("Digite as informações do ToDo logo abaixo:");
+        System.out.println("Deseja continuar...? (Y/n)");
 
-        DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-        LocalDate localDate = LocalDate.parse("25/03/2025", dateFormatter);
+        String opcao = scanner.nextLine();
 
-        DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm:ss");
-        LocalTime localTime = LocalTime.parse("16:00:00", timeFormatter);
+        if (!Objects.equals(opcao, "n")) {
 
-        todo.setData(Date.valueOf(localDate));
-        todo.setHora(Time.valueOf(localTime));
-        todo.setIsok(false);
+            System.out.print("Nome: ");
+            String nome = scanner.nextLine();
 
-        TodoController todoController = new TodoController();
+            System.out.print("Descrição: ");
+            String descricao = scanner.nextLine();
 
-        try {
-            //todoController.add(todo);
-            //System.out.println("ToDo registrado com sucesso!");
-            for(Todo objTodo : todoController.getList()){
-                System.out.println("ID: " + objTodo.getId());
-                System.out.println("Nome: " + objTodo.getNome());
-                System.out.println("Descrição: " + objTodo.getDescricao());
-                System.out.println("Data: " + objTodo.getData());
-                System.out.println("Hora: " + objTodo.getHora());
-                System.out.println("Concluída: " + objTodo.isIsok());
+            System.out.print("Data (ex: 01/01/1900): ");
+            String data = scanner.nextLine();
+
+            System.out.print("Hora (ex: 12:00:00): ");
+            String hora = scanner.nextLine();
+
+            Todo todo = new Todo();
+            todo.setNome(nome);
+            todo.setDescricao(descricao);
+
+            DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+            LocalDate localDate = LocalDate.parse(data, dateFormatter);
+
+            DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm:ss");
+            LocalTime localTime = LocalTime.parse(hora, timeFormatter);
+
+            todo.setData(Date.valueOf(localDate));
+            todo.setHora(Time.valueOf(localTime));
+            todo.setIsok(false);
+
+
+            try {
+                todoController.add(todo);
+                System.out.println("ToDo registrado com sucesso!");
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            } finally {
+                viewTodos();
             }
-        } catch (Exception e) {
-            throw new RuntimeException(e);
+        } else {
+            viewTodos();
         }
     }
 }
